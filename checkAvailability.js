@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DieGRAUs - Uptime Status</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -84,43 +83,13 @@
     </section>
 
     <footer>
-        <h2>Uptime Robot Status</h2>
-        <p>Website Availability <i id="websiteStatusIcon" class="availability-icon"></i> (<a href="https://stats.uptimerobot.com/BY0rjsDYkg" target="_blank" style="color: #3498db;">Historical View</a>)</p>
         <p>Page last updated on: <span id="lastUpdated"></span></p>
     </footer>
 
+    <script src="checkAvailability.js"></script>
     <script>
-        // Example results received from the server-side
-        const availabilityResults = {
-            "Seafile": true,
-            "Bitwarden": true,
-            "Jellyfin": false
-        };
-
-        // Update icons based on availability status
-        function updateIcons() {
-            const serviceIcons = {
-                'Seafile': 'seafileStatusIcon',
-                'Bitwarden': 'bitwardenStatusIcon',
-                'Jellyfin': 'jellyfinStatusIcon'
-            };
-
-            Object.entries(availabilityResults).forEach(([service, isAvailable]) => {
-                const iconElement = document.getElementById(serviceIcons[service]);
-
-                if (iconElement) {
-                    iconElement.className = isAvailable
-                        ? 'fas fa-check-circle availability-icon availability-green'
-                        : 'fas fa-times-circle availability-icon availability-red';
-                }
-            });
-        }
-
         // Update last updated timestamp
         document.getElementById('lastUpdated').innerText = new Date().toLocaleString('de-DE');
-
-        // Update icons on page load
-        updateIcons();
     </script>
 </body>
 </html>
