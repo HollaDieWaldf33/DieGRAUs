@@ -72,48 +72,64 @@
         <a href="https://seafile.uarg.de" class="service-link" target="_blank">
             <i class="fas fa-cloud service-icon"></i> Seafile
             <i id="seafileStatusIcon" class="availability-icon"></i>
+            <span class="status-link">(<a href="https://stats.uptimerobot.com/BY0rjsDYkg/794193267" target="_blank">Stats</a>)</span>
         </a>
         <a href="https://bitwarden.uarg.de" class="service-link" target="_blank">
             <i class="fas fa-key service-icon"></i> Bitwarden
             <i id="bitwardenStatusIcon" class="availability-icon"></i>
+            <span class="status-link">(<a href="https://stats.uptimerobot.com/BY0rjsDYkg/794193267" target="_blank">Stats</a>)</span>
         </a>
         <a href="https://jellyfin.uarg.de" class="service-link" target="_blank">
             <i class="fas fa-tv service-icon"></i> Jellyfin
             <i id="jellyfinStatusIcon" class="availability-icon"></i>
+            <span class="status-link">(<a href="https://stats.uptimerobot.com/BY0rjsDYkg/794193272" target="_blank">Stats</a>)</span>
         </a>
     </section>
 
     <footer>
         <h2>Uptime Robot Status</h2>
-        <p>Website Availability <i id="websiteStatusIcon" class="availability-icon"></i> (<a href="https://stats.uptimerobot.com/BY0rjsDYkg" target="_blank" style="color: #3498db;">Historical View</a>)</p>
+        <p id="websiteStatus">Website Availability <i id="websiteStatusIcon" class="availability-icon"></i></p>
         <p>Page last updated on: <span id="lastUpdated"></span></p>
     </footer>
 
     <script>
-        // Example results received from the server-side
-        const availabilityResults = {
-            "Seafile": true,
-            "Bitwarden": true,
-            "Jellyfin": false
-        };
+        async function getUptimeRobotMonitors(apiKey) {
+            const url = 'https://api.uptimerobot.com/v2/getMonitors';
 
-        // Update icons based on availability status
-        function updateIcons() {
-            const serviceIcons = {
-                'Seafile': 'seafileStatusIcon',
-                'Bitwarden': 'bitwardenStatusIcon',
-                'Jellyfin': 'jellyfinStatusIcon'
-            };
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `api_key=${apiKey}&format=json&logs=1`,
+            });
 
-            Object.entries(availabilityResults).forEach(([service, isAvailable]) => {
-                const iconElement = document.getElementById(serviceIcons[service]);
+            const data = await response.json();
+            return data.monitors;
+        }
+
+        async function updateIcons() {
+            const apiKey = 'ur2100802-5f4856f3c018178c64e7e151'; // Replace with your actual API key
+            const monitors = await getUptimeRobotMonitors(apiKey);
+
+            const services = [
+                { name: 'Seafile', id: '794193267' },
+                { name: 'Bitwarden', id: '794193267' },
+                { name: 'Jellyfin', id: '794193272' },
+            ];
+
+            for (const service of services) {
+                const iconElement = document.getElementById(`${service.name.toLowerCase()}StatusIcon`);
 
                 if (iconElement) {
+                    const matchingMonitor = monitors.find(monitor => monitor.id.toString() === service.id);
+                    const isAvailable = matchingMonitor && matchingMonitor.status === 2;
+
                     iconElement.className = isAvailable
                         ? 'fas fa-check-circle availability-icon availability-green'
                         : 'fas fa-times-circle availability-icon availability-red';
                 }
-            });
+            }
         }
 
         // Update last updated timestamp
