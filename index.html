@@ -69,7 +69,7 @@
 
     <section>
         <h2>Uptime Robot Status</h2>
-        <p>Website Availability <i class="fas fa-check-circle availability-icon availability-green"></i></p>
+        <p>Website Availability <i id="websiteStatusIcon" class="availability-icon"></i></p>
         <p>View the Uptime Robot status directly <a href="https://stats.uptimerobot.com/BY0rjsDYkg" target="_blank" style="color: #3498db;">here</a>.</p>
     </section>
 
@@ -77,15 +77,15 @@
         <h2>Services</h2>
         <a href="https://seafile.uarg.de" class="service-link" target="_blank">
             <i class="fas fa-cloud service-icon"></i> Seafile 
-            <i class="fas fa-check-circle availability-icon availability-green"></i>
+            <i id="seafileStatusIcon" class="availability-icon"></i>
         </a>
         <a href="https://bitwarden.uarg.de" class="service-link" target="_blank">
             <i class="fas fa-key service-icon"></i> Bitwarden 
-            <i class="fas fa-check-circle availability-icon availability-green"></i>
+            <i id="bitwardenStatusIcon" class="availability-icon"></i>
         </a>
         <a href="https://jellyfin.uarg.de" class="service-link" target="_blank">
             <i class="fas fa-tv service-icon"></i> Jellyfin 
-            <i class="fas fa-check-circle availability-icon availability-green"></i>
+            <i id="jellyfinStatusIcon" class="availability-icon"></i>
         </a>
     </section>
 
@@ -94,8 +94,43 @@
     </footer>
 
     <script>
+        // Function to fetch Uptime Robot status
+        async function checkUptimeRobotStatus() {
+            try {
+                const response = await fetch('https://api.uptimerobot.com/v2/getMonitors', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Api-Key': 'ur2100802-5f4856f3c018178c64e7e151',
+                    },
+                    body: JSON.stringify({ 'statuses': '1' }),
+                });
+
+                const data = await response.json();
+
+                // Check if the website status is up
+                const websiteStatusIcon = document.getElementById('websiteStatusIcon');
+                websiteStatusIcon.className = data.monitors[0].status === 2 ? 'fas fa-check-circle availability-icon availability-green' : 'fas fa-times-circle availability-icon availability-red';
+
+                // Check individual service statuses
+                const seafileStatusIcon = document.getElementById('seafileStatusIcon');
+                seafileStatusIcon.className = data.monitors.find(monitor => monitor.friendly_name === 'Seafile').status === 2 ? 'fas fa-check-circle availability-icon availability-green' : 'fas fa-times-circle availability-icon availability-red';
+
+                const bitwardenStatusIcon = document.getElementById('bitwardenStatusIcon');
+                bitwardenStatusIcon.className = data.monitors.find(monitor => monitor.friendly_name === 'Bitwarden').status === 2 ? 'fas fa-check-circle availability-icon availability-green' : 'fas fa-times-circle availability-icon availability-red';
+
+                const jellyfinStatusIcon = document.getElementById('jellyfinStatusIcon');
+                jellyfinStatusIcon.className = data.monitors.find(monitor => monitor.friendly_name === 'Jellyfin').status === 2 ? 'fas fa-check-circle availability-icon availability-green' : 'fas fa-times-circle availability-icon availability-red';
+            } catch (error) {
+                console.error('Error fetching Uptime Robot status:', error);
+            }
+        }
+
         // Update last updated timestamp
         document.getElementById('lastUpdated').innerText = new Date().toLocaleString('de-DE');
+
+        // Fetch Uptime Robot status on page load
+        checkUptimeRobotStatus();
     </script>
 </body>
 </html>
